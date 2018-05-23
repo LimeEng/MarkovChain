@@ -1,6 +1,5 @@
 package markov;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -25,6 +24,12 @@ public class ProbabilityMapping<T> {
     }
 
     public void add(T item, long quantity) {
+        if (quantity == 0) {
+            return;
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Cannot add a negative amount of items");
+        }
         counter.merge(item, quantity, Long::sum);
         totalValues += quantity;
     }
@@ -67,7 +72,9 @@ public class ProbabilityMapping<T> {
     }
 
     public Map<T, Long> getMapping() {
-        return Collections.unmodifiableMap(counter);
+        return counter.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     }
 
     public long getTotalValues() {
