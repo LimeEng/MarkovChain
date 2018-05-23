@@ -84,25 +84,6 @@ public class MarkovChain<T> {
                 .getKey();
     }
 
-    private class RandomSupplier implements Supplier<T> {
-
-        private TokenSequence<T> sequence;
-        private RandomGenerator gen;
-
-        public RandomSupplier(TokenSequence<T> sequence, RandomGenerator gen) {
-            this.sequence = sequence;
-            this.gen = gen;
-        }
-
-        @Override
-        public T get() {
-            T next = matrix.get(sequence)
-                    .getNextRandomly(gen);
-            sequence = sequence.getNext(next);
-            return next;
-        }
-    }
-
     public int getOrder() {
         return order;
     }
@@ -120,5 +101,24 @@ public class MarkovChain<T> {
 
     private static <K, V> String formatEntry(Entry<K, V> entry) {
         return entry.getKey() + " -> " + entry.getValue();
+    }
+
+    private class RandomSupplier implements Supplier<T> {
+
+        private TokenSequence<T> sequence;
+        private RandomGenerator gen;
+
+        public RandomSupplier(TokenSequence<T> sequence, RandomGenerator gen) {
+            this.sequence = sequence;
+            this.gen = gen;
+        }
+
+        @Override
+        public T get() {
+            T next = matrix.get(sequence)
+                    .getNextRandomly(gen);
+            sequence = sequence.getNext(next);
+            return next;
+        }
     }
 }

@@ -41,4 +41,16 @@ public class TokenSequenceTest {
                 seq.getTokens());
     }
 
+    @Test
+    public void testVariousSimpleEquals() {
+        TokenSequence<Integer> seq1 = new TokenSequence<>(1, 2, 3);
+        TokenSequence<Integer> seq2 = new TokenSequence<>(1, 2, 3);
+        TokenSequence<Integer> seq3 = new TokenSequence<>(2, 3, 4);
+        assertTrue(seq1.equals(seq1));
+        assertTrue(seq1.equals(seq2));
+        assertFalse(seq1.equals(seq3));
+        assertFalse(seq1.equals(null));
+        assertFalse(seq1.equals("Hello World!"));
+    }
+
 }

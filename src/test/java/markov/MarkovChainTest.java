@@ -1,14 +1,13 @@
 package markov;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 import markov.MarkovChain;
@@ -18,21 +17,45 @@ import markov.util.SeededRandomGenerator;
 
 public class MarkovChainTest {
 
-    private MarkovChain<Integer> chain;
     private static final RandomGenerator gen = new SeededRandomGenerator(42);
 
-    @Before
-    public void setUp() {
-        chain = createChain(2);
-    }
-
-    @After
-    public void tearDown() {
-        chain = null;
+    @Test
+    public void testOrderZero() {
+        boolean exceptionThrown = false;
+        try {
+            MarkovChain<Integer> chain = createChain(0);
+        } catch (IllegalArgumentException e) {
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
     }
 
     @Test
-    public void testBasicChain() {
+    public void testOrderNegative() {
+        boolean exceptionThrown = false;
+        try {
+            MarkovChain<Integer> chain = createChain(-1);
+        } catch (IllegalArgumentException e) {
+            exceptionThrown = true;
+        }
+        assertTrue(exceptionThrown);
+    }
+
+    @Test
+    public void testSingleElementInput() {
+        MarkovChain<Integer> chain = createChain(2);
+        chain.add(Stream.of(1));
+        List<Integer> actual = chain.stream()
+                .limit(10)
+                .collect(Collectors.toList());
+        List<Integer> expected = Stream.generate(() -> 1)
+                .limit(10)
+                .collect(Collectors.toList());
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testBasicNthChain() {
         int minOrder = 1;
         int maxOrder = 10;
         for (int i = minOrder; i <= maxOrder; i++) {
