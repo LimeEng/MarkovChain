@@ -1,4 +1,5 @@
 [![Build Status](https://travis-ci.org/LimeEng/MarkovChain.svg?branch=master)](https://travis-ci.org/LimeEng/MarkovChain)
+[![codecov](https://codecov.io/gh/LimeEng/MarkovChain/branch/master/graph/badge.svg)](https://codecov.io/gh/LimeEng/MarkovChain)
 
 # Markov Chain
 What is a Markov chain? A great and concise explaination can be found [here](http://setosa.io/ev/markov-chains/), and a longer, more formally correct explaination is available at [Wikipedia](https://en.wikipedia.org/wiki/Markov_chain)
