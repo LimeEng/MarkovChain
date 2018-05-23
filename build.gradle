@@ -39,7 +39,11 @@ jacocoTestReport {
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it,
                     exclude: ['**/*Main*.*',
-                              '**/*PredefinedAlphabetStrings*.*'])
+                              '**/*GraphMLConverter*.*',
+                              '**/*MatrixPrinter*.*',
+                              '**/*RandomGenerator*.*',
+                              '**/*DefaultRandomGenerator*.*',
+                              '**/*SeededRandomGenerator*.*',])
         })
     }
 }
