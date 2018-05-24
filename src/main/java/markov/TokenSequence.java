@@ -8,11 +8,23 @@ import java.util.List;
 public class TokenSequence<T> {
 
     private final LinkedList<T> tokens;
-    
+
+    /**
+     * Constructs a new TokenSequence with the specified array.
+     * 
+     * @param key
+     *            the collection to build the sequence with
+     */
     public TokenSequence(T... key) {
         this(Arrays.asList(key));
     }
 
+    /**
+     * Constructs a new TokenSequence with the specified collection.
+     * 
+     * @param key
+     *            the collection to build the sequence with
+     */
     public TokenSequence(Collection<T> key) {
         tokens = new LinkedList<>(key);
     }
@@ -23,10 +35,24 @@ public class TokenSequence<T> {
         tokens.addLast(next);
     }
 
+    /**
+     * Constructs a new instance of this TokenSequence and the specified token.
+     * The first token in this sequence is dropped and the specified token is
+     * appended to the tail
+     * 
+     * @param next
+     *            the token to be appended
+     * @return a new TokenSequence
+     */
     public TokenSequence<T> getNext(T next) {
         return new TokenSequence<>(tokens, next);
     }
-    
+
+    /**
+     * Returns a copy of the list of tokens.
+     * 
+     * @return a list of tokens
+     */
     public List<T> getTokens() {
         return new LinkedList<>(tokens);
     }
