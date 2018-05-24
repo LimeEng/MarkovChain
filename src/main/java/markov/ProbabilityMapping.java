@@ -14,15 +14,35 @@ public class ProbabilityMapping<T> {
     private final Map<T, Long> counter;
     private long totalValues;
 
+    /**
+     * Constructs a new, empty, ProbabilityMapping
+     */
     public ProbabilityMapping() {
         this.counter = new LinkedHashMap<>();
         this.totalValues = 0;
     }
 
+    /**
+     * Adds the specified item one time to this mapping.
+     * 
+     * @param item
+     *            the item to add to this mapping
+     */
     public void add(T item) {
         add(item, 1);
     }
 
+    /**
+     * Adds the specified item <em>n</em> times to this mapping. A specified
+     * quantity of 0 does nothing.
+     * 
+     * @param item
+     *            the item to add to this mapping
+     * @param quantity
+     *            how many copies of the specified item should be added
+     * @throws IllegalArgumentException
+     *             if quantity < 0
+     */
     public void add(T item, long quantity) {
         if (quantity == 0) {
             return;
@@ -34,6 +54,14 @@ public class ProbabilityMapping<T> {
         totalValues += quantity;
     }
 
+    /**
+     * Merges this and the specified mapping and returns a new one. The merging
+     * does not affect the two mappings used to create the third mapping.
+     * 
+     * @param mapping
+     *            the mapping which should be merged with this
+     * @return the newly constructed ProbabilityMapping
+     */
     public ProbabilityMapping<T> merge(ProbabilityMapping<T> mapping) {
         Map<T, Long> map = merge(counter, mapping.counter, Long::sum);
         ProbabilityMapping<T> newMapping = new ProbabilityMapping<>();
@@ -50,6 +78,16 @@ public class ProbabilityMapping<T> {
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue, remapping::apply));
     }
 
+    /**
+     * Randomly picks an element from this mapping, given the specified random
+     * generator.
+     * 
+     * @param gen
+     *            the random generator used for picking a random element
+     * @throws IllegalStateException
+     *             if the map is empty
+     * @return a randomly chosen element
+     */
     public T getNextRandomly(RandomGenerator gen) {
         if (totalValues == 0) {
             throw new IllegalStateException("Values must be added to the map before one can be chosen");
@@ -71,12 +109,23 @@ public class ProbabilityMapping<T> {
         // Should never happen. Bounds checked earlier
     }
 
+    /**
+     * Returns a copy of the internal representation. Changes in the copy will
+     * not reflect in the original, and vice versa.
+     * 
+     * @return a copy of the internal representation
+     */
     public Map<T, Long> getMapping() {
         return counter.entrySet()
                 .stream()
                 .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     }
 
+    /**
+     * Returns the total count of all items added.
+     * 
+     * @return the total count of all items added
+     */
     public long getTotalValues() {
         return totalValues;
     }
