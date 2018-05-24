@@ -1,7 +1,6 @@
 package markov;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +20,14 @@ public class MarkovChain<T> {
     private final int order;
     private final Map<TokenSequence<T>, ProbabilityMapping<T>> matrix;
 
+    /**
+     * Constructs a new Markov chain of the specified order.
+     * 
+     * @param order
+     *            the order of the Markov chain
+     * @throws IllegalArgumentException
+     *             if the specified order < 1
+     */
     public MarkovChain(int order) {
         if (order < 1) {
             throw new IllegalArgumentException("The order of the markov chain must be positive");
@@ -29,6 +36,14 @@ public class MarkovChain<T> {
         this.matrix = new HashMap<>();
     }
 
+    /**
+     * Builds a transistion matrix based on the specified source. Each element
+     * is considered a token. Note that the stream must be held in memory when
+     * building the matrix.
+     * 
+     * @param source
+     *            the source of the input data.
+     */
     public void add(Stream<T> source) {
         List<List<T>> slidingWindows = StreamUtils.windowed(source.sequential(), order)
                 .collect(Collectors.toList());
@@ -54,18 +69,52 @@ public class MarkovChain<T> {
         }
     }
 
+    /**
+     * Returns an infinite stream representing a random walk through the
+     * transition matrix. The stream starts with a random element.
+     * 
+     * @return an infinite stream
+     */
     public Stream<T> stream() {
         return stream(new DefaultRandomGenerator());
     }
 
+    /**
+     * Returns an infinite stream representing a random walk through the
+     * transition matrix, using the specified random generator. The stream
+     * starts with a random element.
+     * 
+     * @param gen
+     *            the random generator to use
+     * @return an infinite stream
+     */
     public Stream<T> stream(RandomGenerator gen) {
         return stream(getRandomKey(gen), gen);
     }
 
+    /**
+     * Returns an infinite stream representing a random walk through the
+     * transition matrix. The stream starts with the specified TokenSequence.
+     * 
+     * @param start
+     *            the starting tokensequence
+     * @return an infinite stream
+     */
     public Stream<T> stream(TokenSequence<T> start) {
         return stream(start, new DefaultRandomGenerator());
     }
 
+    /**
+     * Returns an infinite stream representing a random walk through the
+     * transition matrix, using the specified random generator. The stream
+     * starts with the specified TokenSequence.
+     * 
+     * @param start
+     *            the starting tokensequence
+     * @param gen
+     *            the random generator to use
+     * @return an infinite stream
+     */
     public Stream<T> stream(TokenSequence<T> start, RandomGenerator gen) {
         Stream<T> head = Stream.of(start.getTokens())
                 .flatMap(List::stream);
@@ -84,12 +133,25 @@ public class MarkovChain<T> {
                 .getKey();
     }
 
+    /**
+     * Returns the order of the Markov chain.
+     * 
+     * @return the order of the Markov chain.
+     */
     public int getOrder() {
         return order;
     }
 
+    /**
+     * Returns a copy of the internal representation. Changes in the copy will
+     * not reflect in the original, and vice versa.
+     * 
+     * @return a copy of the internal representation
+     */
     public Map<TokenSequence<T>, ProbabilityMapping<T>> getMatrix() {
-        return Collections.unmodifiableMap(matrix);
+        return matrix.entrySet()
+                .stream()
+                .collect(Collectors.toMap(Entry::getKey, Entry::getValue));
     }
 
     public void print() {
