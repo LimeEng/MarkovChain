@@ -79,8 +79,9 @@ public class ProbabilityMapping<T> {
     }
 
     /**
-     * Randomly picks an element from this mapping, given the specified random
-     * generator.
+     * An element is randomly picked from this mapping, given the specified
+     * random generator. The random selection is weighted, elements with a
+     * higher quantity are more likely to be selected.
      * 
      * @param gen
      *            the random generator used for picking a random element
@@ -96,13 +97,13 @@ public class ProbabilityMapping<T> {
     }
 
     private T getNextByIndex(long index) { // 0 based (of course)
-        if (index >= totalValues) {
-            throw new IllegalArgumentException("That many values does not exist (" + index + ")");
+        if (index >= totalValues || index < 0) {
+            throw new IndexOutOfBoundsException("Out of bounds: Index = " + index + ", size = " + totalValues);
         }
-        for (T key : counter.keySet()) {
-            index -= counter.get(key);
+        for (Entry<T, Long> entry : counter.entrySet()) {
+            index -= entry.getValue();
             if (index < 0) {
-                return key;
+                return entry.getKey();
             }
         }
         throw new RuntimeException("This should not have happened. I'm sorry");
