@@ -49,7 +49,8 @@ public class TokenSequence<T> {
     }
 
     /**
-     * Returns a copy of the list of tokens.
+     * Returns a copy of the list of tokens. Changes in the copy will not
+     * reflect in the original, and vice versa.
      * 
      * @return a list of tokens
      */
