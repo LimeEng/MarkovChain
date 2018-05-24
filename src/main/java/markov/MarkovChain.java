@@ -37,8 +37,11 @@ public class MarkovChain<T> {
     }
 
     /**
-     * Builds a transistion matrix based on the specified source. Each element
-     * is considered a token. Note that the stream must be held in memory when
+     * Builds a transition matrix based on the specified source. Each element
+     * is considered a token. The stream is also considered to be
+     * <em>circular</em>, which means that the last element is considered to
+     * precede the first element. This property guarantees that an infinite
+     * stream can be created. Note that the stream must be held in memory when
      * building the matrix.
      * 
      * @param source
@@ -97,7 +100,7 @@ public class MarkovChain<T> {
      * transition matrix. The stream starts with the specified TokenSequence.
      * 
      * @param start
-     *            the starting tokensequence
+     *            the starting TokenSequence
      * @return an infinite stream
      */
     public Stream<T> stream(TokenSequence<T> start) {
@@ -110,7 +113,7 @@ public class MarkovChain<T> {
      * starts with the specified TokenSequence.
      * 
      * @param start
-     *            the starting tokensequence
+     *            the starting TokenSequence
      * @param gen
      *            the random generator to use
      * @return an infinite stream
