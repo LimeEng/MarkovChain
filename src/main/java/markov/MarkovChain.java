@@ -37,8 +37,8 @@ public class MarkovChain<T> {
     }
 
     /**
-     * Builds a transition matrix based on the specified source. Each element
-     * is considered a token. The stream is also considered to be
+     * Builds a transition matrix based on the specified source. Each element is
+     * considered a token. The stream is also considered to be
      * <em>circular</em>, which means that the last element is considered to
      * precede the first element. This property guarantees that an infinite
      * stream can be created. Note that the stream must be held in memory when
@@ -125,6 +125,32 @@ public class MarkovChain<T> {
         return Stream.concat(head, tail);
     }
 
+    /**
+     * Returns the next element, given the specified starting sequence.
+     * 
+     * @param start
+     *            the starting TokenSequence
+     * @return the next element
+     */
+    public T getNextRandomly(TokenSequence<T> start) {
+        return getNextRandomly(start, new DefaultRandomGenerator());
+    }
+
+    /**
+     * Returns the next element, given the specified starting sequence and
+     * random generator.
+     * 
+     * @param start
+     *            the starting TokenSequence
+     * @param gen
+     *            the random generator to use
+     * @return the next element
+     */
+    public T getNextRandomly(TokenSequence<T> start, RandomGenerator gen) {
+        return matrix.get(start)
+                .getNextRandomly(gen);
+    }
+
     private TokenSequence<T> getRandomKey(RandomGenerator gen) {
         long index = gen.nextLong(matrix.size());
         Iterator<Entry<TokenSequence<T>, ProbabilityMapping<T>>> iter = matrix.entrySet()
@@ -180,8 +206,7 @@ public class MarkovChain<T> {
 
         @Override
         public T get() {
-            T next = matrix.get(sequence)
-                    .getNextRandomly(gen);
+            T next = getNextRandomly(sequence, gen);
             sequence = sequence.getNext(next);
             return next;
         }
