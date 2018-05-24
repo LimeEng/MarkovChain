@@ -5,9 +5,15 @@ import java.util.Random;
 public class SeededRandomGenerator implements RandomGenerator {
 
     private final Random rnd;
+    private final long seed;
 
     public SeededRandomGenerator(long seed) {
         this.rnd = new Random(seed);
+        this.seed = seed;
+    }
+    
+    public long getSeed() {
+        return seed;
     }
 
     @Override
