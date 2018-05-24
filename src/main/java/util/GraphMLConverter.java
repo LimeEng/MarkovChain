@@ -17,7 +17,23 @@ import markov.TokenSequence;
 
 public class GraphMLConverter {
 
-    // File extension should be .graphml
+    /**
+     * 
+     * Highly experimental and prone to breaking. Only really works with tiny
+     * Markov chains. More of an educational tool than anything else.
+     * 
+     * The exported file can be read by other programs to visualize the graph
+     * that the Markov chain is built out of.
+     * 
+     * .graphml extension.
+     * 
+     * @param chain
+     *            the markov chain to be converted
+     * @param file
+     *            what file the results should be written to
+     * @throws ExportException
+     *             if something goes wrong when exporting to file
+     */
     public static <T> void convertToGraphML(MarkovChain<T> chain, File file) throws ExportException {
         Map<TokenSequence<T>, ProbabilityMapping<T>> mapping = chain.getMatrix();
 

@@ -15,6 +15,15 @@ import markov.TokenSequence;
 
 public class MatrixPrinter {
 
+    /**
+     * Highly experimental and prone to breaking. Only really works with tiny
+     * Markov chains. More of an educational tool than anything else.
+     * 
+     * @param chain
+     *            the chain to be printed as a transition matrix
+     * @param out
+     *            the stream to which the contents will be printed
+     */
     public static <T> void printAsMatrix(MarkovChain<T> chain, PrintStream out) {
         Map<TokenSequence<T>, ProbabilityMapping<T>> matrix = chain.getMatrix();
 
@@ -59,7 +68,7 @@ public class MatrixPrinter {
         int rowHorizontalSpace = 2;
         int colHorizontalSpace = 4;
         int order = chain.getOrder();
-        
+
         String horizontalDivider = "-";
         String verticalDivider = "|";
 
