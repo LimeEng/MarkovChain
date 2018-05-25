@@ -1,13 +1,10 @@
 package markov;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -16,6 +13,7 @@ import org.junit.Test;
 
 import markov.util.RandomGenerator;
 import markov.util.SeededRandomGenerator;
+import test_utils.TestUtility;
 
 public class MarkovChainTest {
 
@@ -23,24 +21,14 @@ public class MarkovChainTest {
 
     @Test
     public void testOrderZero() {
-        boolean exceptionThrown = false;
-        try {
-            MarkovChain<Integer> chain = createChain(0);
-        } catch (IllegalArgumentException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(exceptionThrown);
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
+                () -> createChain(0));
     }
 
     @Test
     public void testOrderNegative() {
-        boolean exceptionThrown = false;
-        try {
-            MarkovChain<Integer> chain = createChain(-1);
-        } catch (IllegalArgumentException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(exceptionThrown);
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
+                () -> createChain(-1));
     }
 
     @Test
@@ -58,7 +46,7 @@ public class MarkovChainTest {
 
     @Test
     public void testMergeWithChainsOfDifferentOrder() {
-        shouldThrowIllegalArgumentException("Did not throw a IllegalArgumentException",
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
                 () -> MarkovChain.merge(createChain(2), createChain(2), createChain(3)));
     }
 
@@ -67,11 +55,11 @@ public class MarkovChainTest {
         List<MarkovChain<Integer>> chains = new ArrayList<>(
                 Arrays.asList(createChain(2), createChain(2), createChain(2), createChain(2)));
         List<Integer> weights = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
-        shouldThrowIllegalArgumentException("Did not throw a IllegalArgumentException",
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
                 () -> MarkovChain.merge(chains, weights));
         weights.remove(0);
         weights.remove(0);
-        shouldThrowIllegalArgumentException("Did not throw a IllegalArgumentException",
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
                 () -> MarkovChain.merge(chains, weights));
     }
 
@@ -80,9 +68,12 @@ public class MarkovChainTest {
         List<MarkovChain<Integer>> chains = new ArrayList<>(
                 Arrays.asList(createChain(2), createChain(2), createChain(2)));
         List<Integer> weights = new ArrayList<>(Arrays.asList(1, 2, 3));
-        shouldThrowNullPointerException("Did not throw a NullPointerException", () -> MarkovChain.merge(null, weights));
-        shouldThrowNullPointerException("Did not throw a NullPointerException", () -> MarkovChain.merge(chains, null));
-        shouldThrowNullPointerException("Did not throw a NullPointerException", () -> MarkovChain.merge(null, null));
+        TestUtility.shouldThrowException("Did not throw a NullPointerException", NullPointerException.class,
+                () -> MarkovChain.merge(null, weights));
+        TestUtility.shouldThrowException("Did not throw a NullPointerException", NullPointerException.class,
+                () -> MarkovChain.merge(chains, null));
+        TestUtility.shouldThrowException("Did not throw a NullPointerException", NullPointerException.class,
+                () -> MarkovChain.merge(null, null));
     }
 
     @Test
@@ -156,25 +147,5 @@ public class MarkovChainTest {
 
     private RandomGenerator createGenerator(long seed) {
         return new SeededRandomGenerator(seed);
-    }
-
-    private void shouldThrowIllegalArgumentException(String message, Supplier<?> supplier) {
-        boolean exceptionThrown = false;
-        try {
-            supplier.get();
-        } catch (IllegalArgumentException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(message, exceptionThrown);
-    }
-
-    private void shouldThrowNullPointerException(String message, Supplier<?> supplier) {
-        boolean exceptionThrown = false;
-        try {
-            supplier.get();
-        } catch (NullPointerException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(message, exceptionThrown);
     }
 }
