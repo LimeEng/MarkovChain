@@ -6,9 +6,11 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
+
 import org.junit.Test;
 
 import markov.util.DefaultRandomGenerator;
+import test_utils.TestUtility;
 
 public class ProbabilityMappingTest {
 
@@ -134,7 +136,8 @@ public class ProbabilityMappingTest {
     @Test
     public void testSetItemWithNegativeQuantity() {
         ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
-        shouldThrowIllegalArgumentException("Did not throw IllegalArgumentException", () -> map.set(4, -1));
+        TestUtility.shouldThrowException("Did not throw IllegalArgumentException", IllegalArgumentException.class,
+                () -> map.set(4, -1));
     }
 
     @Test
@@ -161,19 +164,4 @@ public class ProbabilityMappingTest {
         assertEquals("Total values not correct", map.getTotalValues(), 8);
         assertEquals("Value associated with key not correct", map.get(3), Long.valueOf(8));
     }
-
-    private void shouldThrowIllegalArgumentException(String message, Block block) {
-        boolean exceptionThrown = false;
-        try {
-            block.run();
-        } catch (IllegalArgumentException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(message, exceptionThrown);
-    }
-
-}
-
-interface Block {
-    void run();
 }
