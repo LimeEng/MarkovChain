@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -24,7 +25,10 @@ public class Main {
     public static void main(String[] args) throws Exception {
         System.out.println("Reading...");
 
-        Stream<String> key = streamAndSplit("Bible.txt", "AliceInWonderland.txt", "TrumpSpeech.txt", "TrumpTweets.txt");
+        Stream<String> keyStream0 = streamAndSplit("Bible.txt");
+        Stream<String> keyStream1 = streamAndSplit("AliceInWonderland.txt");
+        Stream<String> keyStream2 = streamAndSplit("TrumpSpeech.txt");
+        Stream<String> keyStream3 = streamAndSplit("TrumpTweets.txt");
 
         Stream<String> textStream0 = streamAndSplit("Bible.txt");
         Stream<String> textStream1 = streamAndSplit("AliceInWonderland.txt");
@@ -62,7 +66,10 @@ public class Main {
 
         System.out.println("Building...");
         MarkovChain<String> keyChain = new MarkovChain<>(2);
-        keyChain.add(key);
+        keyChain.add(keyStream0);
+        keyChain.add(keyStream1);
+        keyChain.add(keyStream2);
+        keyChain.add(keyStream3);
         System.out.println("Starting...");
         // chain.print();
         printStream(20, keyChain.stream(gen)
@@ -70,6 +77,22 @@ public class Main {
         System.out.println();
         printStream(20, master.stream(getGenerator(42))
                 .limit(200));
+        System.out.println("====");
+        Set<?> expected = keyChain.getMatrix()
+                .entrySet();
+        Set<?> actual = master.getMatrix()
+                .entrySet();
+        for (Object entry : expected) {
+            if (!actual.contains(entry)) {
+                System.out.println(entry);
+            }
+        }
+        System.out.println("===");
+        for (Object entry : actual) {
+            if (!expected.contains(entry)) {
+                System.out.println(entry);
+            }
+        }
 
         // System.out.println("Writing to file...");
         // GraphMLConverter.convertToGraphML(chain, new File("temp.graphml"));

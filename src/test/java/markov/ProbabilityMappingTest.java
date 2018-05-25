@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
-
 import org.junit.Test;
 
 import markov.util.DefaultRandomGenerator;
@@ -65,7 +64,7 @@ public class ProbabilityMappingTest {
         }
         assertTrue(exceptionThrown);
     }
-    
+
     @Test
     public void testGetNextRandomlyFromEmptyMapping() {
         boolean exceptionThrown = false;
@@ -132,4 +131,49 @@ public class ProbabilityMappingTest {
         assertFalse(map1.equals("Hello World!"));
     }
 
+    @Test
+    public void testSetItemWithNegativeQuantity() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        shouldThrowIllegalArgumentException("Did not throw IllegalArgumentException", () -> map.set(4, -1));
+    }
+
+    @Test
+    public void testSetItemWithZeroQuantity() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.set(2, 0);
+        assertEquals("Total values not correct", map.getTotalValues(), 0);
+        assertEquals("Value associated with key not correct", map.get(2), 0);
+    }
+
+    @Test
+    public void testSetItemWithItemAlreadyPresent() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.add(3, 5);
+        map.set(3, 8);
+        assertEquals("Total values not correct", map.getTotalValues(), 8);
+        assertEquals("Value associated with key not correct", map.get(3), 8);
+    }
+
+    @Test
+    public void testSetItemWithNoPreviousItemPresent() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.set(3, 8);
+        assertEquals("Total values not correct", map.getTotalValues(), 8);
+        assertEquals("Value associated with key not correct", map.get(3), 8);
+    }
+
+    private void shouldThrowIllegalArgumentException(String message, Block block) {
+        boolean exceptionThrown = false;
+        try {
+            block.run();
+        } catch (IllegalArgumentException e) {
+            exceptionThrown = true;
+        }
+        assertTrue(message, exceptionThrown);
+    }
+
+}
+
+interface Block {
+    void run();
 }

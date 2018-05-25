@@ -22,6 +22,25 @@ public class ProbabilityMapping<T> {
         this.totalValues = 0;
     }
 
+    public void set(T item, long quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Cannot add a negative amount of items");
+        }
+        Long previous = counter.put(item, quantity);
+        if (previous != null) {
+            totalValues -= previous;
+        }
+        totalValues += quantity;
+    }
+
+    public long get(T item) {
+        return counter.get(item);
+    }
+
+    public long getOrDefault(T item, Long otherwise) {
+        return counter.getOrDefault(item, otherwise);
+    }
+
     /**
      * Adds the specified item one time to this mapping.
      * 

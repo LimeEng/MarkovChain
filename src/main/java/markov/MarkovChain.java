@@ -122,7 +122,7 @@ public class MarkovChain<T> {
                     long nextTokenValue = e.getValue();
                     long previous = current.getMapping()
                             .getOrDefault(nextToken, 0L);
-                    current.add(nextToken, previous + (nextTokenValue * weight));
+                    current.set(nextToken, previous + (nextTokenValue * weight));
                 }
                 mergedMap.put(sequence, current);
             }
@@ -212,7 +212,7 @@ public class MarkovChain<T> {
     }
 
     private TokenSequence<T> getRandomKey(RandomGenerator gen) {
-        long index = gen.nextLong(matrix.size());
+        int index = gen.nextInt(matrix.size());
         Iterator<Entry<TokenSequence<T>, ProbabilityMapping<T>>> iter = matrix.entrySet()
                 .iterator();
         for (int i = 0; i < index; i++) {
