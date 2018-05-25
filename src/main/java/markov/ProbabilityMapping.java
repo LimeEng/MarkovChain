@@ -22,9 +22,24 @@ public class ProbabilityMapping<T> {
         this.totalValues = 0;
     }
 
+    /**
+     * Sets the quantity of the specified item. Setting it to zero removes the
+     * item from this collection.
+     * 
+     * @param item
+     *            the item to set the quantity.
+     * @param quantity
+     *            the new quantity of the specified item
+     * @throws IllegalArgumentException
+     *             if quantity < 0
+     */
     public void set(T item, long quantity) {
         if (quantity < 0) {
             throw new IllegalArgumentException("Cannot add a negative amount of items");
+        }
+        if (quantity == 0) {
+            counter.remove(item);
+            return;
         }
         Long previous = counter.put(item, quantity);
         if (previous != null) {
@@ -33,11 +48,31 @@ public class ProbabilityMapping<T> {
         totalValues += quantity;
     }
 
-    public long get(T item) {
+    /**
+     * Returns the value mapped from the specified item, or null if no such item
+     * is contained in this collection
+     * 
+     * @param item
+     *            the key whose associated value is to be returned
+     * @return the value mapped from the specified item, or null if no such item
+     *         is contained in this collection
+     */
+    public Long get(T item) {
         return counter.get(item);
     }
 
-    public long getOrDefault(T item, Long otherwise) {
+    /**
+     * Returns the value mapped from the specified item, or <em>otherwise</em>
+     * if no such item is contained in this collection
+     * 
+     * @param item
+     *            the key whose associated value is to be returned
+     * @param otherwise
+     *            the value to be returned if no mapping for item is present
+     * @return the value mapped from the specified item, or <em>otherwise</em>
+     *         if no such item is contained in this collection
+     */
+    public Long getOrDefault(T item, Long otherwise) {
         return counter.getOrDefault(item, otherwise);
     }
 

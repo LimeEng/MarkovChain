@@ -142,7 +142,7 @@ public class ProbabilityMappingTest {
         ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
         map.set(2, 0);
         assertEquals("Total values not correct", map.getTotalValues(), 0);
-        assertEquals("Value associated with key not correct", map.get(2), 0);
+        assertEquals("Value associated with key not correct", map.get(2), null);
     }
 
     @Test
@@ -151,7 +151,7 @@ public class ProbabilityMappingTest {
         map.add(3, 5);
         map.set(3, 8);
         assertEquals("Total values not correct", map.getTotalValues(), 8);
-        assertEquals("Value associated with key not correct", map.get(3), 8);
+        assertEquals("Value associated with key not correct", map.get(3), Long.valueOf(8));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class ProbabilityMappingTest {
         ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
         map.set(3, 8);
         assertEquals("Total values not correct", map.getTotalValues(), 8);
-        assertEquals("Value associated with key not correct", map.get(3), 8);
+        assertEquals("Value associated with key not correct", map.get(3), Long.valueOf(8));
     }
 
     private void shouldThrowIllegalArgumentException(String message, Block block) {
