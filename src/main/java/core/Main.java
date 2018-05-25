@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,74 +24,16 @@ public class Main {
     public static void main(String[] args) throws Exception {
         System.out.println("Reading...");
 
-        Stream<String> keyStream0 = streamAndSplit("Bible.txt");
-        Stream<String> keyStream1 = streamAndSplit("AliceInWonderland.txt");
-        Stream<String> keyStream2 = streamAndSplit("TrumpSpeech.txt");
-        Stream<String> keyStream3 = streamAndSplit("TrumpTweets.txt");
-
-        Stream<String> textStream0 = streamAndSplit("Bible.txt");
-        Stream<String> textStream1 = streamAndSplit("AliceInWonderland.txt");
-        Stream<String> textStream2 = streamAndSplit("TrumpSpeech.txt");
-        Stream<String> textStream3 = streamAndSplit("TrumpTweets.txt");
-
-        // Stream<String> textStream0 = IntStream.rangeClosed(1, 9)
-        // .boxed()
-        // .map(String::valueOf);
-        // Stream<String> textStream1 = IntStream.rangeClosed(1, 9)
-        // .boxed()
-        // .map(String::valueOf);
-        // Stream<String> textStream2 = IntStream.rangeClosed(1, 9)
-        // .boxed()
-        // .map(String::valueOf);
-        // Stream<String> textStream3 = IntStream.rangeClosed(1, 9)
-        // .boxed()
-        // .map(String::valueOf);
-
-        MarkovChain<String> chain0 = new MarkovChain<>(2);
-        MarkovChain<String> chain1 = new MarkovChain<>(2);
-        MarkovChain<String> chain2 = new MarkovChain<>(2);
-        MarkovChain<String> chain3 = new MarkovChain<>(2);
-
-        chain0.add(textStream0);
-        chain1.add(textStream1);
-        chain2.add(textStream2);
-        chain3.add(textStream3);
-
-        MarkovChain<String> master = MarkovChain.merge(chain0, chain1, chain2, chain3);
-
-        // Stream<String> textStream = IntStream.rangeClosed(1, 9)
-        // .boxed()
-        // .map(String::valueOf);
+        Stream<String> textStream = streamAndSplit("Bible.txt", "AliceInWonderland.txt", "TrumpSpeech.txt",
+                "TrumpTweets.txt");
 
         System.out.println("Building...");
-        MarkovChain<String> keyChain = new MarkovChain<>(2);
-        keyChain.add(keyStream0);
-        keyChain.add(keyStream1);
-        keyChain.add(keyStream2);
-        keyChain.add(keyStream3);
+        MarkovChain<String> chain = new MarkovChain<>(2);
+        chain.add(textStream);
         System.out.println("Starting...");
         // chain.print();
-        printStream(20, keyChain.stream(gen)
+        printStream(20, chain.stream(gen)
                 .limit(200));
-        System.out.println();
-        printStream(20, master.stream(getGenerator(42))
-                .limit(200));
-        System.out.println("====");
-        Set<?> expected = keyChain.getMatrix()
-                .entrySet();
-        Set<?> actual = master.getMatrix()
-                .entrySet();
-        for (Object entry : expected) {
-            if (!actual.contains(entry)) {
-                System.out.println(entry);
-            }
-        }
-        System.out.println("===");
-        for (Object entry : actual) {
-            if (!expected.contains(entry)) {
-                System.out.println(entry);
-            }
-        }
 
         // System.out.println("Writing to file...");
         // GraphMLConverter.convertToGraphML(chain, new File("temp.graphml"));
