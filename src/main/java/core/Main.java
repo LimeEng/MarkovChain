@@ -19,31 +19,68 @@ import markov.util.SeededRandomGenerator;
 
 public class Main {
 
-    private static final RandomGenerator gen = new SeededRandomGenerator(42);
+    private static final RandomGenerator gen = getGenerator(42);
 
     public static void main(String[] args) throws Exception {
         System.out.println("Reading...");
-        List<String> text = getTexts("Bible.txt", "AliceInWonderland.txt", "TrumpSpeech.txt", "TrumpTweets.txt");
-        Stream<String> textStream = Arrays.stream(String.join(" ", text)
-                .split(" "))
-                .filter(e -> !e.trim()
-                        .isEmpty());
+
+        Stream<String> key = streamAndSplit("Bible.txt", "AliceInWonderland.txt", "TrumpSpeech.txt", "TrumpTweets.txt");
+
+        Stream<String> textStream0 = streamAndSplit("Bible.txt");
+        Stream<String> textStream1 = streamAndSplit("AliceInWonderland.txt");
+        Stream<String> textStream2 = streamAndSplit("TrumpSpeech.txt");
+        Stream<String> textStream3 = streamAndSplit("TrumpTweets.txt");
+
+        // Stream<String> textStream0 = IntStream.rangeClosed(1, 9)
+        // .boxed()
+        // .map(String::valueOf);
+        // Stream<String> textStream1 = IntStream.rangeClosed(1, 9)
+        // .boxed()
+        // .map(String::valueOf);
+        // Stream<String> textStream2 = IntStream.rangeClosed(1, 9)
+        // .boxed()
+        // .map(String::valueOf);
+        // Stream<String> textStream3 = IntStream.rangeClosed(1, 9)
+        // .boxed()
+        // .map(String::valueOf);
+
+        MarkovChain<String> chain0 = new MarkovChain<>(2);
+        MarkovChain<String> chain1 = new MarkovChain<>(2);
+        MarkovChain<String> chain2 = new MarkovChain<>(2);
+        MarkovChain<String> chain3 = new MarkovChain<>(2);
+
+        chain0.add(textStream0);
+        chain1.add(textStream1);
+        chain2.add(textStream2);
+        chain3.add(textStream3);
+
+        MarkovChain<String> master = MarkovChain.merge(chain0, chain1, chain2, chain3);
 
         // Stream<String> textStream = IntStream.rangeClosed(1, 9)
         // .boxed()
         // .map(String::valueOf);
 
         System.out.println("Building...");
-        MarkovChain<String> chain = new MarkovChain<>(2);
-        chain.add(textStream);
+        MarkovChain<String> keyChain = new MarkovChain<>(2);
+        keyChain.add(key);
         System.out.println("Starting...");
         // chain.print();
-        printStream(20, chain.stream(gen)
+        printStream(20, keyChain.stream(gen)
+                .limit(200));
+        System.out.println();
+        printStream(20, master.stream(getGenerator(42))
                 .limit(200));
 
         // System.out.println("Writing to file...");
         // GraphMLConverter.convertToGraphML(chain, new File("temp.graphml"));
         // System.out.println("Done");
+    }
+
+    private static Stream<String> streamAndSplit(String... texts) {
+        return Arrays.stream(String.join(" ", getTexts(texts))
+                .split(" "))
+                .filter(e -> !e.trim()
+                        .isEmpty());
     }
 
     private static <T> void printStream(int linebreak, Stream<T> source) {
@@ -79,5 +116,9 @@ public class Main {
 
     private static boolean isNotEmpty(String s) {
         return !s.isEmpty();
+    }
+
+    private static RandomGenerator getGenerator(long seed) {
+        return new SeededRandomGenerator(seed);
     }
 }
