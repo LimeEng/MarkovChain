@@ -39,7 +39,6 @@ jacocoTestReport {
         classDirectories = files(classDirectories.files.collect {
             fileTree(dir: it,
                     exclude: ['**/*Main*.*',
-                              '**/*GraphMLConverter*.*',
                               '**/*MatrixPrinter*.*'])
         })
     }
