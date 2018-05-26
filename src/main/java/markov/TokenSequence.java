@@ -15,6 +15,7 @@ public class TokenSequence<T> {
      * @param key
      *            the collection to build the sequence with
      */
+    @SafeVarargs
     public TokenSequence(T... key) {
         this(Arrays.asList(key));
     }
