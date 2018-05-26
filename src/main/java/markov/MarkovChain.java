@@ -2,6 +2,7 @@ package markov;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -68,7 +69,6 @@ public class MarkovChain<T> {
         }
         for (int i = 0; i < slidingWindows.size(); i++) {
             List<T> window = slidingWindows.get(i);
-            // System.out.println("Window: " + window);
             List<T> nextWindow = slidingWindows.get((i + 1) % slidingWindows.size());
             T followingValue = nextWindow.get(nextWindow.size() - 1);
 
@@ -78,16 +78,60 @@ public class MarkovChain<T> {
         }
     }
 
+    /**
+     * Merges the specified Markov chains and returns a new Markov chains. All
+     * chains are equally weighted
+     * 
+     * @param chains
+     *            the Markov chains to be merged
+     * @return a new Markov chains consisting of the specified chains
+     * @throws NullPointerException
+     *             if any input argument is null
+     * @throws IllegalArgumentException
+     *             if all Markov chains does not have the same order
+     */
     @SafeVarargs
     public static <T> MarkovChain<T> merge(MarkovChain<T>... chains) {
         return merge(Arrays.asList(chains));
     }
 
-    public static <T> MarkovChain<T> merge(List<MarkovChain<T>> chains) {
-        return merge(chains, Collections.nCopies(chains.size(), new Integer(1)));
+    /**
+     * Merges the specified Markov chains and returns a new Markov chains. All
+     * chains are equally weighted
+     * 
+     * @param chains
+     *            the Markov chains to be merged
+     * @return a new Markov chains consisting of the specified chains
+     * @throws NullPointerException
+     *             if any input argument is null
+     * @throws IllegalArgumentException
+     *             if all Markov chains does not have the same order
+     */
+    public static <T> MarkovChain<T> merge(Collection<MarkovChain<T>> chains) {
+        return merge(chains, Collections.nCopies(chains.size(), 1));
     }
 
-    public static <T> MarkovChain<T> merge(List<MarkovChain<T>> chains, List<Integer> weights) {
+    /**
+     * 
+     * Merges the specified Markov chains and returns a new Markov chains. The
+     * weights specifiy how much relative emphasis to place on each chain as the
+     * new one is built.
+     * 
+     * @param chains
+     *            the Markov chains to be merged
+     * @param weights
+     *            the relative emphasis to place on each chain as they are
+     *            merged into a new chain
+     * @return a new Markov chains consisting of the specified chains, weighted
+     *         as specified
+     * @throws NullPointerException
+     *             if any input argument is null
+     * @throws IllegalArgumentException
+     *             if the length of the input arguments do not match
+     * @throws IllegalArgumentException
+     *             if all Markov chains does not have the same order
+     */
+    public static <T> MarkovChain<T> merge(Collection<MarkovChain<T>> chains, List<Integer> weights) {
         if (weights == null || chains == null) {
             throw new NullPointerException("Null items not allowed");
         }
@@ -101,7 +145,10 @@ public class MarkovChain<T> {
         if (uniqueOrders != 1) {
             throw new IllegalArgumentException("All Markov chains must be of the same order");
         }
-        int order = chains.get(0).order;
+        int order = chains.stream()
+                .mapToInt(MarkovChain::getOrder)
+                .findAny()
+                .getAsInt();
 
         List<Map<TokenSequence<T>, ProbabilityMapping<T>>> models = chains.stream()
                 .map(MarkovChain::getMatrix)
