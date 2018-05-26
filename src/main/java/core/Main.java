@@ -34,10 +34,6 @@ public class Main {
         // chain.print();
         printStream(20, chain.stream(gen)
                 .limit(200));
-
-        // System.out.println("Writing to file...");
-        // GraphMLConverter.convertToGraphML(chain, new File("temp.graphml"));
-        // System.out.println("Done");
     }
 
     private static Stream<String> streamAndSplit(String... texts) {

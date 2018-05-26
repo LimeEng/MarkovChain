@@ -52,10 +52,6 @@ dependencies {
     // https://mvnrepository.com/artifact/com.codepoetics/protonpack
     compile group: 'com.codepoetics', name: 'protonpack', version: '1.15'
     
-    compile 'org.jgrapht:jgrapht-core:1.2.0'
-    
-    compile 'org.jgrapht:jgrapht-io:1.2.0'
-    
     // Use JUnit test framework
     testCompile 'junit:junit:4.12'
 }
