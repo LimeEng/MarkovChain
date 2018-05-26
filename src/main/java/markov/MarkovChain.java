@@ -1,6 +1,9 @@
 package markov;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -29,16 +32,20 @@ public class MarkovChain<T> {
      *             if the specified order < 1
      */
     public MarkovChain(int order) {
+        this(order, new HashMap<>());
+    }
+
+    private MarkovChain(int order, Map<TokenSequence<T>, ProbabilityMapping<T>> matrix) {
         if (order < 1) {
             throw new IllegalArgumentException("The order of the markov chain must be positive");
         }
         this.order = order;
-        this.matrix = new HashMap<>();
+        this.matrix = matrix;
     }
 
     /**
-     * Builds a transition matrix based on the specified source. Each element
-     * is considered a token. The stream is also considered to be
+     * Builds a transition matrix based on the specified source. Each element is
+     * considered a token. The stream is also considered to be
      * <em>circular</em>, which means that the last element is considered to
      * precede the first element. This property guarantees that an infinite
      * stream can be created. Note that the stream must be held in memory when
@@ -62,7 +69,6 @@ public class MarkovChain<T> {
         }
         for (int i = 0; i < slidingWindows.size(); i++) {
             List<T> window = slidingWindows.get(i);
-            // System.out.println("Window: " + window);
             List<T> nextWindow = slidingWindows.get((i + 1) % slidingWindows.size());
             T followingValue = nextWindow.get(nextWindow.size() - 1);
 
@@ -70,6 +76,107 @@ public class MarkovChain<T> {
             mapping.add(followingValue);
             matrix.merge(new TokenSequence<>(window), mapping, ProbabilityMapping::merge);
         }
+    }
+
+    /**
+     * Merges the specified Markov chains and returns a new Markov chains. All
+     * chains are equally weighted
+     * 
+     * @param chains
+     *            the Markov chains to be merged
+     * @return a new Markov chains consisting of the specified chains
+     * @throws NullPointerException
+     *             if any input argument is null
+     * @throws IllegalArgumentException
+     *             if all Markov chains does not have the same order
+     */
+    @SafeVarargs
+    public static <T> MarkovChain<T> merge(MarkovChain<T>... chains) {
+        return merge(Arrays.asList(chains));
+    }
+
+    /**
+     * Merges the specified Markov chains and returns a new Markov chains. All
+     * chains are equally weighted
+     * 
+     * @param chains
+     *            the Markov chains to be merged
+     * @return a new Markov chains consisting of the specified chains
+     * @throws NullPointerException
+     *             if any input argument is null
+     * @throws IllegalArgumentException
+     *             if all Markov chains does not have the same order
+     */
+    public static <T> MarkovChain<T> merge(Collection<MarkovChain<T>> chains) {
+        return merge(chains, Collections.nCopies(chains.size(), 1));
+    }
+
+    /**
+     * 
+     * Merges the specified Markov chains and returns a new Markov chains. The
+     * weights specifiy how much relative emphasis to place on each chain as the
+     * new one is built.
+     * 
+     * @param chains
+     *            the Markov chains to be merged
+     * @param weights
+     *            the relative emphasis to place on each chain as they are
+     *            merged into a new chain
+     * @return a new Markov chains consisting of the specified chains, weighted
+     *         as specified
+     * @throws NullPointerException
+     *             if any input argument is null
+     * @throws IllegalArgumentException
+     *             if the length of the input arguments do not match
+     * @throws IllegalArgumentException
+     *             if all Markov chains does not have the same order
+     */
+    public static <T> MarkovChain<T> merge(Collection<MarkovChain<T>> chains, List<Integer> weights) {
+        if (weights == null || chains == null) {
+            throw new NullPointerException("Null items not allowed");
+        }
+        if (chains.size() != weights.size()) {
+            throw new IllegalArgumentException("The length of the input arguments must match");
+        }
+        long uniqueOrders = chains.stream()
+                .mapToInt(MarkovChain::getOrder)
+                .distinct()
+                .count();
+        if (uniqueOrders != 1) {
+            throw new IllegalArgumentException("All Markov chains must be of the same order");
+        }
+        int order = chains.stream()
+                .mapToInt(MarkovChain::getOrder)
+                .findAny()
+                .getAsInt();
+
+        List<Map<TokenSequence<T>, ProbabilityMapping<T>>> models = chains.stream()
+                .map(MarkovChain::getMatrix)
+                .collect(Collectors.toList());
+
+        Map<TokenSequence<T>, ProbabilityMapping<T>> mergedMap = new HashMap<>();
+
+        for (int i = 0; i < models.size(); i++) {
+            Map<TokenSequence<T>, ProbabilityMapping<T>> model = models.get(i);
+            int weight = weights.get(i);
+            for (Entry<TokenSequence<T>, ProbabilityMapping<T>> entry : model.entrySet()) {
+                TokenSequence<T> sequence = entry.getKey();
+                ProbabilityMapping<T> mapping = entry.getValue();
+                ProbabilityMapping<T> current = mergedMap.getOrDefault(sequence, new ProbabilityMapping<>());
+                for (Entry<T, Long> e : mapping.getMapping()
+                        .entrySet()) {
+                    T nextToken = e.getKey();
+                    long nextTokenValue = e.getValue();
+                    long previous = current.getMapping()
+                            .getOrDefault(nextToken, 0L);
+                    current.set(nextToken, previous + (nextTokenValue * weight));
+                }
+                mergedMap.put(sequence, current);
+            }
+        }
+
+        MarkovChain<T> mergedChain = new MarkovChain<>(order, mergedMap);
+        return mergedChain;
     }
 
     /**
@@ -125,8 +232,34 @@ public class MarkovChain<T> {
         return Stream.concat(head, tail);
     }
 
+    /**
+     * Returns the next element, given the specified starting sequence.
+     * 
+     * @param start
+     *            the starting TokenSequence
+     * @return the next element
+     */
+    public T getNextRandomly(TokenSequence<T> start) {
+        return getNextRandomly(start, new DefaultRandomGenerator());
+    }
+
+    /**
+     * Returns the next element, given the specified starting sequence and
+     * random generator.
+     * 
+     * @param start
+     *            the starting TokenSequence
+     * @param gen
+     *            the random generator to use
+     * @return the next element
+     */
+    public T getNextRandomly(TokenSequence<T> start, RandomGenerator gen) {
+        return matrix.get(start)
+                .getNextRandomly(gen);
+    }
+
     private TokenSequence<T> getRandomKey(RandomGenerator gen) {
-        long index = gen.nextLong(matrix.size());
+        int index = gen.nextInt(matrix.size());
         Iterator<Entry<TokenSequence<T>, ProbabilityMapping<T>>> iter = matrix.entrySet()
                 .iterator();
         for (int i = 0; i < index; i++) {
@@ -180,8 +313,7 @@ public class MarkovChain<T> {
 
         @Override
         public T get() {
-            T next = matrix.get(sequence)
-                    .getNextRandomly(gen);
+            T next = getNextRandomly(sequence, gen);
             sequence = sequence.getNext(next);
             return next;
         }

@@ -7,9 +7,13 @@ What is a Markov chain? A great and concise explaination can be found [here](htt
 To understand the sample code, the first link is all that is needed.
 
 - [Sample code](#sample-code)
+  - [Basic usage](#basic-usage)
+  - [Combining chains](#combining-chains)
 - [Installation](#installation)
 
 ## Sample Code
+
+### Basic Usage
 
 ```java
 Stream<String> inputStream = ...
@@ -27,6 +31,39 @@ This particular MarkovChain is of order 2, which means that the last two element
 The real challenge, which this project doesn't pretend to solve, (at least not yet) is how the input should be tokenized. That is left as an exercise to the reader. 
 
 Note that the MarkovChain is generic, which means that any kind of object can be used, not just strings! Due to the nature of Markov chains a large input corpus is preferred if an output that deviates from the source is desired. 
+
+### Combining Chains
+
+Markov chains can also be combined!
+
+```java
+Stream<String> inputA = ...;
+Stream<String> inputB = ...;
+        
+MarkovChain<String> chainA = new MarkovChain<>(2);
+MarkovChain<String> chainB = new MarkovChain<>(2);
+        
+chainA.add(inputA);
+chainB.add(inputB);
+
+MarkovChain<String> merged = MarkovChain.merge(chainA, chainB);
+```
+
+The newly constructed Markov chain can be used like any other. It is also possible to optionally specify weights, to place a relative emphasis on each source. This is how that is done:
+
+```java
+MarkovChain<String> merged = MarkovChain.merge(chainA, chainB, Arrays.asList(1, 2));
+```
+
+This means that it's twice as likely that a connection in chainB is chosen instead of chainA. 
+
+To merge two or more Markov chains, three conditions must be fulfilled: 
+
+- No input arguments may be null.
+- The length of the input arguments must be the same.
+- All Markov chains must be of the same order.
+
+If any of these conditions is not met, an exception will be thrown.
 
 ## Installation
 

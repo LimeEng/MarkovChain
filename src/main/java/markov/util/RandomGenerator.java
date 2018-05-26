@@ -3,32 +3,32 @@ package markov.util;
 public interface RandomGenerator {
 
     /**
-     * Returns a pseudorandom long value between the specified origin
-     * (inclusive) and the specified bound (exclusive).
+     * Returns a pseudorandom long value between the specified min (inclusive)
+     * and the specified bound (exclusive).
      *
-     * @param origin
+     * @param min
      *            the least value returned
-     * @param bound
+     * @param max
      *            the upper bound (exclusive)
-     * @return a pseudorandom long value between the origin (inclusive) and the
-     *         bound (exclusive)
+     * @return a pseudorandom long value between the min (inclusive) and max
+     *         (exclusive)
      * @throws IllegalArgumentException
-     *             if origin is greater than or equal to bound
+     *             if min is greater than or equal to max
      */
     long nextLong(long min, long max);
 
     /**
-     * Returns a pseudorandom int value between the specified origin (inclusive)
+     * Returns a pseudorandom int value between the specified min (inclusive)
      * and the specified bound (exclusive).
      *
-     * @param origin
+     * @param min
      *            the least value returned
-     * @param bound
+     * @param max
      *            the upper bound (exclusive)
-     * @return a pseudorandom int value between the origin (inclusive) and the
-     *         bound (exclusive)
+     * @return a pseudorandom int value between the min (inclusive) and max
+     *         (exclusive)
      * @throws IllegalArgumentException
-     *             if origin is greater than or equal to bound
+     *             if min is greater than or equal to max
      */
     int nextInt(int min, int max);
 
@@ -38,10 +38,10 @@ public interface RandomGenerator {
      *
      * @param max
      *            the upper bound (exclusive)
-     * @return a pseudorandom long value between 0 (inclusive) and the bound
+     * @return a pseudorandom long value between 0 (inclusive) and max
      *         (exclusive)
      * @throws IllegalArgumentException
-     *             if origin is greater than or equal to bound
+     *             if 0 is greater than or equal to max
      */
     default long nextLong(long max) {
         return nextLong(0, max);
@@ -53,10 +53,10 @@ public interface RandomGenerator {
      *
      * @param max
      *            the upper bound (exclusive)
-     * @return a pseudorandom int value between 0 (inclusive) and the bound
+     * @return a pseudorandom int value between 0 (inclusive) and max
      *         (exclusive)
      * @throws IllegalArgumentException
-     *             if origin is greater than or equal to bound
+     *             if 0 is greater than or equal to max
      */
     default int nextInt(int max) {
         return nextInt(0, max);

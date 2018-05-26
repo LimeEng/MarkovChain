@@ -19,19 +19,13 @@ import markov.util.SeededRandomGenerator;
 
 public class Main {
 
-    private static final RandomGenerator gen = new SeededRandomGenerator(42);
+    private static final RandomGenerator gen = getGenerator(42);
 
     public static void main(String[] args) throws Exception {
         System.out.println("Reading...");
-        List<String> text = getTexts("Bible.txt", "AliceInWonderland.txt", "TrumpSpeech.txt", "TrumpTweets.txt");
-        Stream<String> textStream = Arrays.stream(String.join(" ", text)
-                .split(" "))
-                .filter(e -> !e.trim()
-                        .isEmpty());
 
-        // Stream<String> textStream = IntStream.rangeClosed(1, 9)
-        // .boxed()
-        // .map(String::valueOf);
+        Stream<String> textStream = streamAndSplit("Bible.txt", "AliceInWonderland.txt", "TrumpSpeech.txt",
+                "TrumpTweets.txt");
 
         System.out.println("Building...");
         MarkovChain<String> chain = new MarkovChain<>(2);
@@ -44,6 +38,13 @@ public class Main {
         // System.out.println("Writing to file...");
         // GraphMLConverter.convertToGraphML(chain, new File("temp.graphml"));
         // System.out.println("Done");
+    }
+
+    private static Stream<String> streamAndSplit(String... texts) {
+        return Arrays.stream(String.join(" ", getTexts(texts))
+                .split(" "))
+                .filter(e -> !e.trim()
+                        .isEmpty());
     }
 
     private static <T> void printStream(int linebreak, Stream<T> source) {
@@ -79,5 +80,9 @@ public class Main {
 
     private static boolean isNotEmpty(String s) {
         return !s.isEmpty();
+    }
+
+    private static RandomGenerator getGenerator(long seed) {
+        return new SeededRandomGenerator(seed);
     }
 }

@@ -10,6 +10,7 @@ import java.util.Map;
 import org.junit.Test;
 
 import markov.util.DefaultRandomGenerator;
+import test_utils.TestUtility;
 
 public class ProbabilityMappingTest {
 
@@ -65,7 +66,7 @@ public class ProbabilityMappingTest {
         }
         assertTrue(exceptionThrown);
     }
-    
+
     @Test
     public void testGetNextRandomlyFromEmptyMapping() {
         boolean exceptionThrown = false;
@@ -132,4 +133,89 @@ public class ProbabilityMappingTest {
         assertFalse(map1.equals("Hello World!"));
     }
 
+    @Test
+    public void testSetItemWithNegativeQuantity() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        TestUtility.shouldThrowException("Did not throw IllegalArgumentException", IllegalArgumentException.class,
+                () -> map.set(4, -1));
+    }
+
+    @Test
+    public void testSetItemWithZeroQuantity() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.set(2, 0);
+        assertEquals("Total values not correct", map.getTotalValues(), 0);
+        assertEquals("Value associated with key not correct", map.get(2), null);
+    }
+
+    @Test
+    public void testSetItemWithItemAlreadyPresent() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.add(3, 5);
+        map.set(3, 8);
+        assertEquals("Total values not correct", map.getTotalValues(), 8);
+        assertEquals("Value associated with key not correct", map.get(3), Long.valueOf(8));
+    }
+
+    @Test
+    public void testSetItemWithNoPreviousItemPresent() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.set(3, 8);
+        assertEquals("Total values not correct", map.getTotalValues(), 8);
+        assertEquals("Value associated with key not correct", map.get(3), Long.valueOf(8));
+    }
+
+    @Test
+    public void testGetWithEmptyMapping() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        Long value = map.get(2);
+        assertTrue(value == null);
+    }
+
+    @Test
+    public void testGetWithManyMappings() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.add(3, 4);
+        map.add(4, 5);
+        map.add(5, 6);
+        Long value = map.get(3);
+        assertTrue(value == 4);
+    }
+
+    @Test
+    public void testGetWithInvalidItem() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.add(3, 4);
+        map.add(4, 5);
+        map.add(5, 6);
+        Long value = map.get(2);
+        assertTrue(value == null);
+    }
+
+    @Test
+    public void testDefaultGetEmptyMapping() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        Long value = map.getOrDefault(2, 100L);
+        assertTrue(value == 100);
+    }
+
+    @Test
+    public void testDefaultGetManyMappings() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.add(3, 4);
+        map.add(4, 5);
+        map.add(5, 6);
+        Long value = map.getOrDefault(3, 100L);
+        assertTrue(value == 4);
+    }
+
+    @Test
+    public void testDefaultInvalidItem() {
+        ProbabilityMapping<Integer> map = new ProbabilityMapping<>();
+        map.add(3, 4);
+        map.add(4, 5);
+        map.add(5, 6);
+        Long value = map.getOrDefault(2, 100L);
+        assertTrue(value == 100);
+    }
 }

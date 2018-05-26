@@ -1,12 +1,10 @@
 package markov.util;
 
-import static org.junit.Assert.assertTrue;
-
-import java.util.function.Supplier;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+
+import test_utils.TestUtility;
 
 public abstract class RandomGeneratorTest {
 
@@ -26,29 +24,25 @@ public abstract class RandomGeneratorTest {
 
     @Test
     public void testMinLargerThanMax() {
-        shouldThrowIllegalArgumentException("nextInt not throwing exception", () -> gen.nextInt(10, 9));
-        shouldThrowIllegalArgumentException("nextLong not throwing exception", () -> gen.nextLong(10, 9));
+        TestUtility.shouldThrowException("nextInt not throwing exception", IllegalArgumentException.class,
+                () -> gen.nextInt(10, 9));
+        TestUtility.shouldThrowException("nextLong not throwing exception", IllegalArgumentException.class,
+                () -> gen.nextLong(10, 9));
     }
 
     @Test
     public void testMinEqualToMax() {
-        shouldThrowIllegalArgumentException("nextInt not throwing exception", () -> gen.nextInt(10, 10));
-        shouldThrowIllegalArgumentException("nextLong not throwing exception", () -> gen.nextLong(10, 10));
+        TestUtility.shouldThrowException("nextInt not throwing exception", IllegalArgumentException.class,
+                () -> gen.nextInt(10, 10));
+        TestUtility.shouldThrowException("nextLong not throwing exception", IllegalArgumentException.class,
+                () -> gen.nextLong(10, 10));
     }
 
     @Test
     public void testMaxLessThanZero() {
-        shouldThrowIllegalArgumentException("nextInt not throwing exception", () -> gen.nextInt(-1));
-        shouldThrowIllegalArgumentException("nextLong not throwing exception", () -> gen.nextLong(-1));
-    }
-
-    private void shouldThrowIllegalArgumentException(String message, Supplier<Number> supplier) {
-        boolean exceptionThrown = false;
-        try {
-            supplier.get();
-        } catch (IllegalArgumentException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(message, exceptionThrown);
+        TestUtility.shouldThrowException("nextInt not throwing exception", IllegalArgumentException.class,
+                () -> gen.nextInt(-1));
+        TestUtility.shouldThrowException("nextLong not throwing exception", IllegalArgumentException.class,
+                () -> gen.nextLong(-1));
     }
 }

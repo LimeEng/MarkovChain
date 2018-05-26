@@ -1,44 +1,34 @@
 package markov;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import org.junit.Test;
 
-import markov.MarkovChain;
-import markov.TokenSequence;
 import markov.util.RandomGenerator;
 import markov.util.SeededRandomGenerator;
+import test_utils.TestUtility;
 
 public class MarkovChainTest {
 
-    private static final RandomGenerator gen = new SeededRandomGenerator(42);
+    private final RandomGenerator gen = createGenerator(42);
 
     @Test
     public void testOrderZero() {
-        boolean exceptionThrown = false;
-        try {
-            MarkovChain<Integer> chain = createChain(0);
-        } catch (IllegalArgumentException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(exceptionThrown);
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
+                () -> createChain(0));
     }
 
     @Test
     public void testOrderNegative() {
-        boolean exceptionThrown = false;
-        try {
-            MarkovChain<Integer> chain = createChain(-1);
-        } catch (IllegalArgumentException e) {
-            exceptionThrown = true;
-        }
-        assertTrue(exceptionThrown);
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
+                () -> createChain(-1));
     }
 
     @Test
@@ -52,6 +42,69 @@ public class MarkovChainTest {
                 .limit(10)
                 .collect(Collectors.toList());
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void testMergeWithChainsOfDifferentOrder() {
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
+                () -> MarkovChain.merge(createChain(2), createChain(2), createChain(3)));
+    }
+
+    @Test
+    public void testMergeWithChainsAndWeightsOfDifferentLength() {
+        List<MarkovChain<Integer>> chains = new ArrayList<>(
+                Arrays.asList(createChain(2), createChain(2), createChain(2), createChain(2)));
+        List<Integer> weights = new ArrayList<>(Arrays.asList(1, 2, 3, 4, 5));
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
+                () -> MarkovChain.merge(chains, weights));
+        weights.remove(0);
+        weights.remove(0);
+        TestUtility.shouldThrowException("Did not throw a IllegalArgumentException", IllegalArgumentException.class,
+                () -> MarkovChain.merge(chains, weights));
+    }
+
+    @Test
+    public void testMergeWithNullArguments() {
+        List<MarkovChain<Integer>> chains = new ArrayList<>(
+                Arrays.asList(createChain(2), createChain(2), createChain(2)));
+        List<Integer> weights = new ArrayList<>(Arrays.asList(1, 2, 3));
+        TestUtility.shouldThrowException("Did not throw a NullPointerException", NullPointerException.class,
+                () -> MarkovChain.merge(null, weights));
+        TestUtility.shouldThrowException("Did not throw a NullPointerException", NullPointerException.class,
+                () -> MarkovChain.merge(chains, null));
+        TestUtility.shouldThrowException("Did not throw a NullPointerException", NullPointerException.class,
+                () -> MarkovChain.merge(null, null));
+    }
+
+    @Test
+    public void testBasicMergeWithoutWeights() {
+
+        List<Integer> list1 = randomStream(gen, 0, 10).limit(1000)
+                .collect(Collectors.toList());
+        List<Integer> list2 = randomStream(gen, 0, 10).limit(1000)
+                .collect(Collectors.toList());
+        List<Integer> list3 = randomStream(gen, 0, 10).limit(1000)
+                .collect(Collectors.toList());
+
+        MarkovChain<Integer> reference = createChain(2);
+        reference.add(list1.stream());
+        reference.add(list2.stream());
+        reference.add(list3.stream());
+
+        MarkovChain<Integer> chain1 = createChain(2);
+        MarkovChain<Integer> chain2 = createChain(2);
+        MarkovChain<Integer> chain3 = createChain(2);
+
+        chain1.add(list1.stream());
+        chain2.add(list2.stream());
+        chain3.add(list3.stream());
+        MarkovChain<Integer> combined = MarkovChain.merge(chain1, chain2, chain3);
+
+        Set<?> expected = reference.getMatrix()
+                .entrySet();
+        Set<?> actual = combined.getMatrix()
+                .entrySet();
+        assertEquals("Merging Markov chains does not match an equivalent \"unmerged\" Markov chain ", expected, actual);
     }
 
     @Test
@@ -83,7 +136,16 @@ public class MarkovChainTest {
         assertEquals("The generated stream does not match the expected list", expected, actual);
     }
 
+    private Stream<Integer> randomStream(RandomGenerator gen, int min, int max) {
+        return IntStream.generate(() -> gen.nextInt(min, max))
+                .boxed();
+    }
+
     private MarkovChain<Integer> createChain(int order) {
         return new MarkovChain<>(order);
+    }
+
+    private RandomGenerator createGenerator(long seed) {
+        return new SeededRandomGenerator(seed);
     }
 }
