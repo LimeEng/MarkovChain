@@ -13,10 +13,9 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.codepoetics.protonpack.StreamUtils;
-
 import markov.util.DefaultRandomGenerator;
 import markov.util.RandomGenerator;
+import util.WindowedStream;
 
 public class MarkovChain<T> {
 
@@ -55,7 +54,7 @@ public class MarkovChain<T> {
      *            the source of the input data.
      */
     public void add(Stream<T> source) {
-        List<List<T>> slidingWindows = StreamUtils.windowed(source.sequential(), order)
+        List<List<T>> slidingWindows = WindowedStream.windowed(source.sequential(), order)
                 .collect(Collectors.toList());
         // Imagine the input text as circular. We must therefore add new lists
         // to the slidingWindows to simulate this
