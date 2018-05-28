@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import org.junit.Test;
 
 import test_utils.TestUtility;
@@ -45,12 +46,18 @@ public class WindowedStreamTest {
         List<List<Integer>> windows = WindowedStream.windowed(source.stream(), size)
                 .collect(Collectors.toList());
         for (List<Integer> window : windows) {
-            System.out.println(size + ": " + window.size());
             assertEquals("Size of window not matching parameter", size, window.size());
         }
-        long elements = windows.stream()
-                .flatMap(List::stream)
-                .count();
-        assertEquals("Number of items in stream not matching", size * source.size(), elements);
+        assertEquals("Number of lists produced not matching", source.size() - size + 1, windows.size());
+
+        int counter = 0;
+        for (List<Integer> window : windows) {
+            for (int i = 0; i < window.size(); i++) {
+                int expected = source.get(counter + i);
+                int actual = window.get(i);
+                assertEquals("Element out of place", expected, actual);
+            }
+            counter++;
+        }
     }
 }

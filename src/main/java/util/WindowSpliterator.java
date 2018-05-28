@@ -34,14 +34,18 @@ public class WindowSpliterator<T> implements Spliterator<List<T>> {
 
     @Override
     public long estimateSize() {
-        // TODO Auto-generated method stub
-        return 0;
+        long size = source.estimateSize();
+        if (size == 0) {
+            return 0;
+        } else if (size <= windowSize) {
+            return 1;
+        }
+        return size - windowSize;
     }
 
     @Override
     public int characteristics() {
-        // TODO Auto-generated method stub
-        return 0;
+        return Spliterator.SIZED | Spliterator.ORDERED;
     }
 
 }
