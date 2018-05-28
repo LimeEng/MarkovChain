@@ -10,6 +10,12 @@ public class WindowSpliterator<T> implements Spliterator<List<T>> {
     private final int windowSize;
 
     public WindowSpliterator(Spliterator<T> source, int windowSize) {
+        if (windowSize < 1) {
+            throw new IllegalArgumentException("Window size may not be < 1");
+        }
+        if (source == null) {
+            throw new NullPointerException("Spliterator may not be null");
+        }
         this.source = source;
         this.windowSize = windowSize;
     }
