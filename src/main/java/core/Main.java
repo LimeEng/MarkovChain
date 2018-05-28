@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
-
-import com.codepoetics.protonpack.Indexed;
-import com.codepoetics.protonpack.StreamUtils;
 
 import markov.MarkovChain;
 import markov.util.RandomGenerator;
@@ -44,14 +45,18 @@ public class Main {
     }
 
     private static <T> void printStream(int linebreak, Stream<T> source) {
-        StreamUtils.zipWithIndex(source)
+        Stream<Long> numbers = LongStream.range(0, Long.MAX_VALUE)
+                .boxed();
+        Iterator<Long> iter = numbers.iterator();
+        source.map(e -> new SimpleEntry<>(e, iter.next()))
                 .forEach(e -> printIndexed(e, linebreak));
         System.out.println();
     }
 
-    private static <T> void printIndexed(Indexed<T> indexed, int linebreak) {
-        System.out.print(indexed.getValue() + " ");
-        if (indexed.getIndex() % linebreak == 0 && indexed.getIndex() != 0) {
+    private static <T> void printIndexed(Entry<T, Long> indexed, int linebreak) {
+        System.out.print(indexed.getKey() + " ");
+        long index = indexed.getValue();
+        if (index % linebreak == 0 && index != 0) {
             System.out.println();
         }
     }
