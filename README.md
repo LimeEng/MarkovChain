@@ -52,7 +52,7 @@ MarkovChain<String> merged = MarkovChain.merge(chainA, chainB);
 The newly constructed Markov chain can be used like any other. It is also possible to optionally specify weights, to place a relative emphasis on each source. This is how that is done:
 
 ```java
-MarkovChain<String> merged = MarkovChain.merge(chainA, chainB, Arrays.asList(1, 2));
+MarkovChain<String> merged = MarkovChain.merge(Arrays.asList(chainA, chainB), Arrays.asList(1, 2));
 ```
 
 This means that it's twice as likely that a connection in chainB is chosen instead of chainA. 
