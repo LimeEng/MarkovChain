@@ -1,8 +1,5 @@
 install: gradle wrapper --gradle-version 3.3
 language: java
-jdk: oraclejdk8
+jdk: openjdk8
 git:
     submodules: false
-after_success:
-  - if [ -e ./gradlew ]; then ./gradlew jacocoTestReport;else gradle jacocoTestReport;fi
-  - bash <(curl -s https://codecov.io/bash)
