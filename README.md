@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/LimeEng/MarkovChain.svg?branch=master)](https://travis-ci.org/LimeEng/MarkovChain)
+![](https://github.com/LimeEng/MarkovChain/workflows/Java%20CI/badge.svg)
 
 # Markov Chain
 What is a Markov chain? A great and concise explaination can be found [here](http://setosa.io/ev/markov-chains/), and a longer, more formally correct explaination is available at [Wikipedia](https://en.wikipedia.org/wiki/Markov_chain)
